@@ -58,7 +58,7 @@ func Do(p Params) *Result {
 	AST, err := parser.Parse(parser.ParseParams{Source: source})
 	if err != nil {
 		// run parseFinishFuncs for extensions
-		extErrs = parseFinishFn(err)
+		extErrs = parseFinishFn(AST, err)
 
 		// merge the errors from extensions and the original error from parser
 		extErrs = append(extErrs, gqlerrors.FormatErrors(err)...)
@@ -68,7 +68,7 @@ func Do(p Params) *Result {
 	}
 
 	// run parseFinish functions for extensions
-	extErrs = parseFinishFn(err)
+	extErrs = parseFinishFn(AST, err)
 	if len(extErrs) != 0 {
 		return &Result{
 			Errors: extErrs,

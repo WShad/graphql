@@ -5,13 +5,14 @@ import (
 	"fmt"
 
 	"github.com/WShad/graphql/gqlerrors"
+	"github.com/WShad/graphql/language/ast"
 )
 
 type (
 	// ParseFinishFunc is called when the parse of the query is done
-	ParseFinishFunc func(error)
+	ParseFinishFunc func(*ast.Document, error)
 	// parseFinishFuncHandler handles the call of all the ParseFinishFuncs from the extenisons
-	parseFinishFuncHandler func(error) []gqlerrors.FormattedError
+	parseFinishFuncHandler func(*ast.Document, error) []gqlerrors.FormattedError
 
 	// ValidationFinishFunc is called when the Validation of the query is finished
 	ValidationFinishFunc func([]gqlerrors.FormattedError)
@@ -96,7 +97,7 @@ func handleExtensionsParseDidStart(p *Params) ([]gqlerrors.FormattedError, parse
 			fs[ext.Name()] = finishFn
 		}()
 	}
-	return errs, func(err error) []gqlerrors.FormattedError {
+	return errs, func(document *ast.Document, err error) []gqlerrors.FormattedError {
 		errs := gqlerrors.FormattedErrors{}
 		for name, fn := range fs {
 			func() {
@@ -106,7 +107,7 @@ func handleExtensionsParseDidStart(p *Params) ([]gqlerrors.FormattedError, parse
 						errs = append(errs, gqlerrors.FormatError(fmt.Errorf("%s.ParseFinishFunc: %v", name, r.(error))))
 					}
 				}()
-				fn(err)
+				fn(document, err)
 			}()
 		}
 		return errs

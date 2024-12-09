@@ -9,6 +9,7 @@ import (
 
 	"github.com/WShad/graphql"
 	"github.com/WShad/graphql/gqlerrors"
+	"github.com/WShad/graphql/language/ast"
 	"github.com/WShad/graphql/testutil"
 )
 
@@ -73,7 +74,7 @@ func TestExtensionParseDidStartPanic(t *testing.T) {
 		if true {
 			panic(errors.New("test error"))
 		}
-		return ctx, func(err error) {
+		return ctx, func(document *ast.Document, err error) {
 
 		}
 	}
@@ -101,7 +102,7 @@ func TestExtensionParseDidStartPanic(t *testing.T) {
 func TestExtensionParseFinishFuncPanic(t *testing.T) {
 	ext := newtestExt("testExt")
 	ext.parseDidStartFn = func(ctx context.Context) (context.Context, graphql.ParseFinishFunc) {
-		return ctx, func(err error) {
+		return ctx, func(document *ast.Document, err error) {
 			panic(errors.New("test error"))
 		}
 	}
@@ -388,7 +389,7 @@ func newtestExt(name string) *testExt {
 	}
 	if ext.parseDidStartFn == nil {
 		ext.parseDidStartFn = func(ctx context.Context) (context.Context, graphql.ParseFinishFunc) {
-			return ctx, func(err error) {
+			return ctx, func(document *ast.Document, err error) {
 
 			}
 		}
